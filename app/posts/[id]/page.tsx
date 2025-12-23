@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPostById, getAllCategories } from '@/lib/posts';
-import { PostDetailClient } from './PostDetailClient';
+import { PostDetailWrapper } from './PostDetailWrapper';
 
 interface PostPageProps {
   params: Promise<{
@@ -43,5 +43,5 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const categories = getAllCategories();
-  return <PostDetailClient post={post} categories={categories} />;
+  return <PostDetailWrapper post={post} categories={categories} />;
 }

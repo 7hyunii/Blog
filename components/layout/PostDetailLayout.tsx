@@ -1,39 +1,36 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { MobileHeader } from '@/components/layout/MobileHeader';
-import { PostDetail } from '@/components/post/PostDetail';
-import type { Post } from '@/lib/posts';
+import React from 'react';
 
-interface PostDetailClientProps {
-  post: Post;
+interface PostDetailLayoutProps {
   categories: string[];
+  children: React.ReactNode;
 }
 
-export function PostDetailClient({ post, categories }: PostDetailClientProps) {
+export function PostDetailLayout({ categories, children }: PostDetailLayoutProps) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleCategorySelect = (category: string) => {
-    router.push('/');
+    const categoryQuery = category === 'All' ? '' : `?category=${encodeURIComponent(category)}`;
+    router.push(`/${categoryQuery}`);
     setIsMobileMenuOpen(false);
   };
+
   const handleHomeClick = () => {
     router.push('/');
     setIsMobileMenuOpen(false);
   };
 
-  const handleBack = () => {
-    router.push('/');
-  };
-
   return (
-    <div className="flex min-h-screen bg-gray-950">
+    <div className="flex min-h-screen bg-gray-950 overflow-x-hidden w-full">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
-        <Sidebar 
+        <Sidebar
           categories={categories}
           selectedCategory="All"
           onCategorySelect={handleCategorySelect}
@@ -42,7 +39,7 @@ export function PostDetailClient({ post, categories }: PostDetailClientProps) {
 
       {/* Mobile Header */}
       <div className="lg:hidden">
-        <MobileHeader 
+        <MobileHeader
           onMenuClick={() => setIsMobileMenuOpen(true)}
           onHomeClick={handleHomeClick}
         />
@@ -51,12 +48,12 @@ export function PostDetailClient({ post, categories }: PostDetailClientProps) {
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <>
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 z-40 lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 w-72 z-50 lg:hidden">
-            <Sidebar 
+            <Sidebar
               categories={categories}
               selectedCategory="All"
               onCategorySelect={handleCategorySelect}
@@ -65,16 +62,11 @@ export function PostDetailClient({ post, categories }: PostDetailClientProps) {
           </div>
         </>
       )}
-      
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-72 pt-16 lg:pt-0">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12 lg:py-16 xl:py-20">
-          <PostDetail 
-            post={post} 
-            onBack={handleBack}
-          />
-        </div>
-      </main>
+
+      {/* Main Content area will be provided as children */}
+      <div className="flex-1 lg:ml-72 pt-16 lg:pt-0 w-full overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }

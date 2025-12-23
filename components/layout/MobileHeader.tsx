@@ -18,7 +18,7 @@ export function MobileHeader({ onMenuClick, onHomeClick }: MobileHeaderProps) {
           <Menu className="w-6 h-6" strokeWidth={2} />
         </button>
 
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2" onClick={onHomeClick}>
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
             <User className="w-5 h-5 text-white" strokeWidth={2.5} />
           </div>

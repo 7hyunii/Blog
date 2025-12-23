@@ -1,3 +1,5 @@
+"use client";
+
 import { MessageSquare, ThumbsUp, Reply } from 'lucide-react';
 import { useState } from 'react';
 import { mockComments, type Comment } from '../../data/mockComments';
@@ -95,7 +97,7 @@ function CommentItem({ comment, isReply = false }: CommentItemProps) {
   };
 
   return (
-    <div className={isReply ? 'ml-8 sm:ml-12' : ''}>
+    <div className={isReply ? 'ml-4 sm:ml-12' : ''}>
       <div className="bg-gray-900/30 border border-gray-800/50 rounded-xl p-4 sm:p-5">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -115,7 +117,7 @@ function CommentItem({ comment, isReply = false }: CommentItemProps) {
           </div>
         </div>
 
-        <p className="text-gray-400 leading-relaxed mb-3 sm:mb-4 text-xs sm:text-sm">
+        <p className="text-gray-400 leading-relaxed mb-3 sm:mb-4 text-xs sm:text-sm break-words">
           {comment.content}
         </p>
 
