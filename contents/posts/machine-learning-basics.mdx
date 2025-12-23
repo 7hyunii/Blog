@@ -1,0 +1,201 @@
+---
+title: "머신러닝 기초: 경사 하강법과 활성화 함수"
+category: "AI"
+date: "2024-12-19"
+---
+
+머신러닝의 핵심 개념인 경사 하강법과 신경망의 활성화 함수를 수식과 함께 이해해봅니다.
+
+## 경사 하강법 (Gradient Descent)
+
+경사 하강법은 손실 함수(Loss Function)를 최소화하기 위한 최적화 알고리즘입니다.
+
+### 기본 수식
+
+$$\theta_{new} = \theta_{old} - \alpha \cdot \nabla J(\theta)$$
+
+여기서:
+- $\theta$: 모델의 파라미터 (가중치)
+- $\alpha$: 학습률 (learning rate)
+- $\nabla J(\theta)$: 손실 함수의 그래디언트 (기울기)
+
+### 학습 과정
+
+1. 초기 파라미터 설정: $\theta_0$
+2. 손실 계산: $J(\theta) = \frac{1}{2m} \sum_{i=1}^{m}(h(x^{(i)}) - y^{(i)})^2$
+3. 그래디언트 계산: $\frac{\partial J}{\partial \theta}$
+4. 파라미터 업데이트: $\theta := \theta - \alpha \cdot \frac{\partial J}{\partial \theta}$
+5. 수렴할 때까지 2-4 반복
+
+## 경사 하강법 종류 비교
+
+| 알고리즘 | 배치 크기 | 속도 | 메모리 | 수렴성 | 수식 |
+|---------|----------|------|--------|--------|------|
+| **Batch GD** | 전체 (m) | 느림 | 많음 | 안정적 | $\theta := \theta - \alpha \cdot \frac{1}{m}\sum \nabla J(x^{(i)})$ |
+| **Stochastic GD** | 1 | 빠름 | 적음 | 불안정 | $\theta := \theta - \alpha \cdot \nabla J(x^{(i)})$ |
+| **Mini-batch GD** | k (32-512) | 중간 | 중간 | 균형적 | $\theta := \theta - \alpha \cdot \frac{1}{k}\sum \nabla J(x^{(i)})$ |
+
+## 활성화 함수 (Activation Functions)
+
+신경망의 비선형성을 부여하는 함수들입니다.
+
+### 주요 활성화 함수
+
+| 함수 | 수식 | 범위 | 도함수 | 특징 |
+|------|------|------|--------|------|
+| **Sigmoid** | $\sigma(x) = \frac{1}{1+e^{-x}}$ | (0, 1) | $\sigma'(x) = \sigma(x) \cdot (1-\sigma(x))$ | 이진 분류, 기울기 소실 |
+| **Tanh** | $\tanh(x) = \frac{e^x-e^{-x}}{e^x+e^{-x}}$ | (-1, 1) | $\tanh'(x) = 1-\tanh^2(x)$ | 0 중심, 기울기 소실 |
+| **ReLU** | $f(x) = \max(0, x)$ | $[0, \infty)$ | $f'(x) = \begin{cases} 1 & x>0 \\ 0 & x \leq 0 \end{cases}$ | 빠름, Dead ReLU |
+| **Leaky ReLU** | $f(x) = \max(\alpha x, x)$ | $(-\infty, \infty)$ | $f'(x) = \begin{cases} 1 & x>0 \\ \alpha & x \leq 0 \end{cases}$ | Dead ReLU 해결 |
+| **Softmax** | $\sigma(x)_i = \frac{e^{x_i}}{\sum_j e^{x_j}}$ | (0, 1) | - | 다중 분류 |
+
+### 1. Sigmoid 함수
+
+$$\sigma(x) = \frac{1}{1 + e^{-x}}$$
+
+```python
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# 도함수
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    return s * (1 - s)
+```
+
+**장점:**
+- 출력이 0~1 사이로 정규화됨
+- 확률로 해석 가능
+
+**단점:**
+- 기울기 소실 문제 ($x$가 매우 크거나 작을 때 기울기 $\approx 0$)
+- 계산 비용이 높음
+
+### 2. ReLU (Rectified Linear Unit)
+
+$$f(x) = \max(0, x)$$
+
+```python
+def relu(x):
+    return np.maximum(0, x)
+
+# 도함수
+def relu_derivative(x):
+    return np.where(x > 0, 1, 0)
+```
+
+**장점:**
+- 계산이 단순하고 빠름
+- 기울기 소실 문제 완화
+- 희소성(Sparsity) 제공
+
+**단점:**
+- Dead ReLU: $x < 0$일 때 뉴런이 죽을 수 있음
+
+### 3. Softmax
+
+$$\sigma(x)_i = \frac{\exp(x_i)}{\sum_{j=1}^{n} \exp(x_j)}$$
+
+```python
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))  # 수치 안정성
+    return exp_x / np.sum(exp_x)
+```
+
+다중 클래스 분류의 출력층에서 사용되며, 모든 출력의 합이 1입니다.
+
+## 손실 함수 (Loss Functions)
+
+| 손실 함수 | 수식 | 용도 | 특징 |
+|----------|------|------|------|
+| **MSE** | $L = \frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i - y_i)^2$ | 회귀 | 이상치에 민감 |
+| **MAE** | $L = \frac{1}{n}\sum_{i=1}^{n} \|\hat{y}_i - y_i\|$ | 회귀 | 이상치에 강건 |
+| **Cross Entropy** | $L = -\sum_{i=1}^{n} y_i \cdot \log(\hat{y}_i)$ | 분류 | 확률 분포 비교 |
+| **Binary Cross Entropy** | $L = -[y \cdot \log(\hat{y}) + (1-y) \cdot \log(1-\hat{y})]$ | 이진 분류 | Sigmoid 출력 |
+| **Hinge Loss** | $L = \max(0, 1-y \cdot \hat{y})$ | SVM | 마진 최대화 |
+
+## 최적화 알고리즘 비교
+
+### 학습률 적응형 알고리즘
+
+| 알고리즘 | 업데이트 규칙 | 장점 | 단점 |
+|---------|-------------|------|------|
+| **SGD** | $\theta := \theta - \alpha \cdot g$ | 단순함 | 학습률 조정 필요 |
+| **Momentum** | $v := \beta v + g$ <br/> $\theta := \theta - \alpha \cdot v$ | 가속, 진동 감소 | 하이퍼파라미터 증가 |
+| **AdaGrad** | $\theta := \theta - \frac{\alpha}{\sqrt{\sum g^2}} \cdot g$ | 학습률 자동 조정 | 학습률 급감 |
+| **RMSprop** | $s := \beta s + (1-\beta)g^2$ <br/> $\theta := \theta - \frac{\alpha}{\sqrt{s}} \cdot g$ | AdaGrad 개선 | - |
+| **Adam** | $m := \beta_1 m + (1-\beta_1)g$ <br/> $v := \beta_2 v + (1-\beta_2)g^2$ <br/> $\theta := \theta - \alpha \cdot \frac{m}{\sqrt{v}}$ | 빠른 수렴 | 메모리 많이 사용 |
+
+### Adam 알고리즘 상세
+
+**파라미터 업데이트:**
+
+1. 그래디언트: $g_t = \nabla_\theta J(\theta)$
+2. 1차 모멘트: $m_t = \beta_1 \cdot m_{t-1} + (1-\beta_1) \cdot g_t$
+3. 2차 모멘트: $v_t = \beta_2 \cdot v_{t-1} + (1-\beta_2) \cdot g_t^2$
+4. 편향 보정: $\hat{m}_t = \frac{m_t}{1-\beta_1^t}, \hat{v}_t = \frac{v_t}{1-\beta_2^t}$
+5. 업데이트: $\theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$
+
+**기본 하이퍼파라미터:**
+- $\alpha$ (학습률) = 0.001
+- $\beta_1$ = 0.9 (1차 모멘트 감쇠)
+- $\beta_2$ = 0.999 (2차 모멘트 감쇠)
+- $\epsilon$ = $10^{-8}$ (수치 안정성)
+
+## 역전파 (Backpropagation)
+
+신경망 학습의 핵심 알고리즘입니다.
+
+### 순전파 (Forward Pass)
+
+$$z^{(l)} = W^{(l)} \cdot a^{(l-1)} + b^{(l)}$$
+$$a^{(l)} = \sigma(z^{(l)})$$
+
+### 역전파 (Backward Pass)
+
+$$\delta^{(L)} = \nabla_a J \odot \sigma'(z^{(L)})$$
+$$\delta^{(l)} = ((W^{(l+1)})^T \cdot \delta^{(l+1)}) \odot \sigma'(z^{(l)})$$
+
+$$\frac{\partial J}{\partial W^{(l)}} = \delta^{(l)} \cdot (a^{(l-1)})^T$$
+$$\frac{\partial J}{\partial b^{(l)}} = \delta^{(l)}$$
+
+## 정규화 기법
+
+| 기법 | 수식 | 효과 | 사용 시기 |
+|------|------|------|----------|
+| **L1 정규화** | $\lambda \sum_{i} \|w_i\|$ | 희소성, 특성 선택 | 많은 특성 |
+| **L2 정규화** | $\lambda \sum_{i} w_i^2$ | 가중치 감소 | 과적합 방지 |
+| **Dropout** | $p(keep) = 0.5 \sim 0.8$ | 앙상블 효과 | 깊은 신경망 |
+| **Batch Norm** | $\hat{x} = \frac{x-\mu}{\sqrt{\sigma^2+\epsilon}}$ | 학습 안정화 | 대부분의 경우 |
+
+## 실전 예제
+
+### 선형 회귀
+
+**가설 함수:** $h(x) = \theta_0 + \theta_1 x$
+
+**손실 함수:** $J(\theta) = \frac{1}{2m} \sum_{i=1}^{m}(h(x^{(i)}) - y^{(i)})^2$
+
+**그래디언트:**
+- $\frac{\partial J}{\partial \theta_0} = \frac{1}{m} \sum_{i=1}^{m}(h(x^{(i)}) - y^{(i)})$
+- $\frac{\partial J}{\partial \theta_1} = \frac{1}{m} \sum_{i=1}^{m}(h(x^{(i)}) - y^{(i)}) \cdot x^{(i)}$
+
+```python
+# 경사 하강법 구현
+def gradient_descent(X, y, alpha=0.01, iterations=1000):
+    m = len(y)
+    theta = np.zeros(2)
+    
+    for _ in range(iterations):
+        h = theta[0] + theta[1] * X
+        error = h - y
+        
+        theta[0] -= alpha * (1/m) * np.sum(error)
+        theta[1] -= alpha * (1/m) * np.sum(error * X)
+    
+    return theta
+```
+
+---
+
+머신러닝의 수학적 기초를 이해하면 더 효과적인 모델을 설계하고 디버깅할 수 있습니다.

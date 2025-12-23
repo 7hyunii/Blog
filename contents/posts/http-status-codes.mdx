@@ -1,0 +1,95 @@
+---
+title: "HTTP 상태 코드 완벽 정리"
+category: "Backend"
+date: "2024-12-22"
+---
+
+웹 개발을 하다 보면 자주 마주치는 HTTP 상태 코드들을 정리하고, 각각의 의미와 사용 사례를 알아봅니다.
+
+## HTTP 상태 코드란?
+
+HTTP 상태 코드는 클라이언트의 요청에 대한 서버의 응답 상태를 나타내는 3자리 숫자입니다. 첫 번째 숫자가 응답의 종류를 나타냅니다.
+
+## 주요 상태 코드 비교표
+
+### 2xx - 성공
+
+| 상태 코드 | 이름 | 설명 | 사용 예시 |
+|---------|------|------|----------|
+| 200 | OK | 요청 성공 | GET 요청 성공 |
+| 201 | Created | 리소스 생성 성공 | POST로 새 유저 생성 |
+| 204 | No Content | 성공했지만 응답 본문 없음 | DELETE 요청 성공 |
+
+### 3xx - 리다이렉션
+
+| 상태 코드 | 이름 | 설명 | 사용 예시 |
+|---------|------|------|----------|
+| 301 | Moved Permanently | 영구적으로 이동됨 | 도메인 변경 |
+| 302 | Found | 임시로 이동됨 | 임시 URL 리다이렉트 |
+| 304 | Not Modified | 캐시된 리소스 사용 | 조건부 GET 요청 |
+
+### 4xx - 클라이언트 오류
+
+| 상태 코드 | 이름 | 설명 | 사용 예시 |
+|---------|------|------|----------|
+| 400 | Bad Request | 잘못된 요청 | 유효하지 않은 JSON |
+| 401 | Unauthorized | 인증 필요 | 로그인이 필요한 API |
+| 403 | Forbidden | 권한 없음 | 관리자 전용 페이지 |
+| 404 | Not Found | 리소스 없음 | 존재하지 않는 URL |
+| 429 | Too Many Requests | 요청 횟수 초과 | Rate Limiting |
+
+### 5xx - 서버 오류
+
+| 상태 코드 | 이름 | 설명 | 사용 예시 |
+|---------|------|------|----------|
+| 500 | Internal Server Error | 서버 내부 오류 | 처리되지 않은 예외 |
+| 502 | Bad Gateway | 게이트웨이 오류 | 프록시 서버 문제 |
+| 503 | Service Unavailable | 서비스 이용 불가 | 서버 과부하 |
+
+## 실전 활용 팁
+
+### 1. RESTful API 설계
+
+```javascript
+// 성공 케이스
+app.post('/api/users', (req, res) => {
+  const user = createUser(req.body);
+  res.status(201).json(user); // Created
+});
+
+// 오류 케이스
+app.get('/api/users/:id', (req, res) => {
+  const user = findUser(req.params.id);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  res.status(200).json(user);
+});
+```
+
+### 2. 인증/인가 처리
+
+```javascript
+// 401 vs 403
+app.get('/api/admin', authenticate, authorize, (req, res) => {
+  // authenticate 실패 → 401 Unauthorized
+  // authorize 실패 → 403 Forbidden
+  res.status(200).json({ data: 'admin data' });
+});
+```
+
+## 상태 코드 선택 가이드
+
+상황에 맞는 적절한 상태 코드를 사용하면 API의 의미를 명확히 전달할 수 있습니다:
+
+- **리소스 생성 성공** → 201 Created
+- **리소스 삭제 성공** → 204 No Content
+- **인증 정보 없음** → 401 Unauthorized
+- **권한 부족** → 403 Forbidden
+- **리소스 없음** → 404 Not Found
+- **중복 요청** → 409 Conflict
+- **유효성 검사 실패** → 422 Unprocessable Entity
+
+---
+
+올바른 HTTP 상태 코드 사용은 API의 품질을 높이고, 디버깅을 쉽게 만듭니다.

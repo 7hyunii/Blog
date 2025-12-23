@@ -1,0 +1,46 @@
+---
+title: "Clean Code 원칙 실천하기"
+category: "Programming"
+date: "2024-12-12"
+---
+
+로버트 C. 마틴의 Clean Code 원칙을 실제 프로젝트에 적용하는 방법을 정리했습니다.
+
+## 의미 있는 이름 사용하기
+
+변수, 함수, 클래스의 이름은 **존재 이유, 수행 기능, 사용 방법**을 명확히 드러내야 합니다.
+
+```javascript
+// Bad
+const d = new Date();
+
+// Good  
+const currentDate = new Date();
+```
+
+## 함수는 한 가지 일만
+
+함수는 한 가지 작업만 수행해야 하며, 그 작업을 완벽하게 수행해야 합니다.
+
+```javascript
+// Bad - 여러 가지 일을 함
+function processUserData(user) {
+  validateUser(user);
+  saveToDatabase(user);
+  sendEmail(user);
+}
+
+// Good - 한 가지 일만
+function validateAndSaveUser(user) {
+  if (!isValid(user)) return false;
+  return saveToDatabase(user);
+}
+```
+
+## 주석보다는 코드로 설명
+
+주석은 코드로 표현할 수 없는 것만 작성합니다.
+
+---
+
+좋은 코드는 유지보수를 쉽게 만들고, 팀원들과의 협업을 원활하게 합니다.

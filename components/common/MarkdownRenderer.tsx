@@ -1,0 +1,196 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+// Load SyntaxHighlighter only on the client to avoid SSR/CSR markup differences
+const SyntaxHighlighter = dynamic(
+  () => import('react-syntax-highlighter').then((mod) => mod.Prism),
+  { ssr: false }
+);
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+interface MarkdownRendererProps {
+  content: string;
+}
+
+export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+  return (
+    <div className="markdown-content">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        components={{
+          // Headings
+          h1: ({ children }) => (
+            <h1 className="text-2xl sm:text-3xl tracking-tight mt-8 sm:mt-10 mb-4 sm:mb-5 text-gray-100">
+              {children}
+            </h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className="text-xl sm:text-2xl tracking-tight mt-10 sm:mt-12 mb-3 sm:mb-4 text-gray-100">
+              {children}
+            </h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className="text-lg sm:text-xl tracking-tight mt-6 sm:mt-8 mb-2 sm:mb-3 text-gray-200">
+              {children}
+            </h3>
+          ),
+          h4: ({ children }) => (
+            <h4 className="text-base sm:text-lg tracking-tight mt-5 sm:mt-6 mb-2 text-gray-300">
+              {children}
+            </h4>
+          ),
+
+          // Paragraph
+          p: ({ children }) => (
+            <p className="mb-4 sm:mb-5 text-gray-400 leading-relaxed text-sm sm:text-base">
+              {children}
+            </p>
+          ),
+
+          // Lists
+          ul: ({ children }) => (
+            <ul className="space-y-2 my-5 sm:my-6 ml-4 sm:ml-6">
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="space-y-2 my-5 sm:my-6 ml-4 sm:ml-6 list-decimal list-inside">
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => (
+            <li className="flex gap-2 sm:gap-3 text-gray-400 leading-relaxed text-sm sm:text-base">
+              <span className="text-blue-400 mt-1">•</span>
+              <span className="flex-1">{children}</span>
+            </li>
+          ),
+
+          // Code blocks
+          code: ({ node, inline, className, children, ...props }: any) => {
+            const match = /language-(\w+)/.exec(className || '');
+            const language = match ? match[1] : '';
+            const codeString = String(children).replace(/\n$/, '');
+
+            if (inline) {
+              return (
+                <code className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded text-xs sm:text-sm font-mono" {...props}>
+                  {children}
+                </code>
+              );
+            }
+
+            return (
+              <div className="my-6 rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 shadow-xl shadow-gray-900/20">
+                {language && (
+                  <div className="px-3 sm:px-4 py-2 bg-gray-800/50 border-b border-gray-700/50 text-gray-400 text-xs tracking-wide uppercase flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    {language}
+                  </div>
+                )}
+                <SyntaxHighlighter
+                  language={language || 'text'}
+                  style={vscDarkPlus}
+                  customStyle={{
+                    margin: 0,
+                    padding: '1.25rem',
+                    background: 'transparent',
+                    fontSize: '0.875rem',
+                  }}
+                  codeTagProps={{
+                    style: {
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    }
+                  }}
+                >
+                  {codeString}
+                </SyntaxHighlighter>
+              </div>
+            );
+          },
+
+              // Prevent invalid nesting like <p><pre> by customizing pre
+              pre: ({ children }) => <div>{children}</div>,
+
+          // Tables
+          table: ({ children }) => (
+            <div className="my-6 sm:my-8 overflow-x-auto rounded-xl border border-gray-800">
+              <table className="w-full border-collapse">
+                {children}
+              </table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="bg-gray-900/50">
+              {children}
+            </thead>
+          ),
+          tbody: ({ children }) => (
+            <tbody className="divide-y divide-gray-800">
+              {children}
+            </tbody>
+          ),
+          tr: ({ children }) => (
+            <tr className="hover:bg-gray-900/30 transition-colors">
+              {children}
+            </tr>
+          ),
+          th: ({ children }) => (
+            <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm text-gray-300 tracking-tight border-b border-gray-800">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-400">
+              {children}
+            </td>
+          ),
+
+          // Links
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/30 hover:decoration-blue-400/50 transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {children}
+            </a>
+          ),
+
+          // Blockquote
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-blue-500/50 pl-4 sm:pl-6 my-5 sm:my-6 text-gray-400 italic">
+              {children}
+            </blockquote>
+          ),
+
+          // Horizontal rule
+          hr: () => (
+            <hr className="my-10 sm:my-12 border-gray-800" />
+          ),
+
+          // Strong/Bold
+          strong: ({ children }) => (
+            <strong className="text-gray-200">
+              {children}
+            </strong>
+          ),
+
+          // Emphasis/Italic
+          em: ({ children }) => (
+            <em className="text-gray-300 italic">
+              {children}
+            </em>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+}

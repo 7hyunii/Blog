@@ -1,0 +1,189 @@
+---
+title: "알고리즘 복잡도와 Big O 표기법"
+category: "Algorithm"
+date: "2024-12-21"
+---
+
+알고리즘의 효율성을 평가하는 Big O 표기법과 시간 복잡도, 공간 복잡도에 대해 알아봅니다.
+
+## Big O 표기법이란?
+
+Big O 표기법은 알고리즘의 성능을 수학적으로 표현하는 방법입니다. 입력 크기 $n$에 대한 연산 횟수의 **상한선**을 나타냅니다.
+
+### 수학적 정의
+
+함수 $f(n) = O(g(n))$은 다음을 만족합니다:
+
+$$\exists c > 0, \exists n_0 > 0, \forall n \geq n_0 : f(n) \leq c \cdot g(n)$$
+
+즉, 충분히 큰 $n$에 대해 $f(n)$이 $c \cdot g(n)$보다 작거나 같은 상수 $c$가 존재합니다.
+
+## 주요 시간 복잡도 비교
+
+| 표기법 | 이름 | 예시 | n=10 | n=100 | n=1000 |
+|--------|------|------|------|-------|--------|
+| $O(1)$ | 상수 시간 | 배열 인덱스 접근 | 1 | 1 | 1 |
+| $O(\log n)$ | 로그 시간 | 이진 탐색 | 3 | 7 | 10 |
+| $O(n)$ | 선형 시간 | 선형 탐색 | 10 | 100 | 1,000 |
+| $O(n \log n)$ | 선형 로그 시간 | 병합 정렬, 퀵 정렬 | 30 | 664 | 9,966 |
+| $O(n^2)$ | 이차 시간 | 버블 정렬 | 100 | 10,000 | 1,000,000 |
+| $O(n^3)$ | 삼차 시간 | 3중 반복문 | 1,000 | 1,000,000 | 1,000,000,000 |
+| $O(2^n)$ | 지수 시간 | 피보나치 재귀 | 1,024 | $1.27 \times 10^{30}$ | $\infty$ |
+
+## 복잡도 계산 예시
+
+### 1. 단순 반복문 - $O(n)$
+
+```javascript
+function sum(arr) {
+  let total = 0;
+  for (let i = 0; i < arr.length; i++) {
+    total += arr[i];  // n번 실행
+  }
+  return total;
+}
+// T(n) = n → O(n)
+```
+
+### 2. 중첩 반복문 - $O(n^2)$
+
+```javascript
+function bubbleSort(arr) {
+  for (let i = 0; i < arr.length; i++) {        // n번
+    for (let j = 0; j < arr.length - i; j++) {  // n번
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+}
+// T(n) = n × n = n² → O(n²)
+```
+
+### 3. 이진 탐색 - $O(\log n)$
+
+```javascript
+function binarySearch(arr, target) {
+  let left = 0, right = arr.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) left = mid + 1;
+    else right = mid - 1;
+  }
+  return -1;
+}
+// 매 반복마다 탐색 범위가 1/2로 줄어듦
+// T(n) = log₂ n → O(log n)
+```
+
+## 공간 복잡도 비교
+
+| 알고리즘 | 시간 복잡도 | 공간 복잡도 | 안정성 | 비고 |
+|---------|-----------|-----------|--------|------|
+| 버블 정렬 | $O(n^2)$ | $O(1)$ | ✅ 안정 | 구현 간단 |
+| 선택 정렬 | $O(n^2)$ | $O(1)$ | ❌ 불안정 | 교환 횟수 적음 |
+| 삽입 정렬 | $O(n^2)$ | $O(1)$ | ✅ 안정 | 거의 정렬된 경우 빠름 |
+| 병합 정렬 | $O(n \log n)$ | $O(n)$ | ✅ 안정 | 최악에도 $O(n \log n)$ |
+| 퀵 정렬 | $O(n \log n)$ | $O(\log n)$ | ❌ 불안정 | 평균적으로 가장 빠름 |
+| 힙 정렬 | $O(n \log n)$ | $O(1)$ | ❌ 불안정 | 추가 메모리 불필요 |
+
+## 마스터 정리 (Master Theorem)
+
+재귀 알고리즘의 시간 복잡도를 계산하는 공식입니다.
+
+$$T(n) = aT(n/b) + f(n)$$
+
+여기서:
+- $a$: 재귀 호출 횟수
+- $b$: 문제 크기 감소 비율
+- $f(n)$: 재귀 호출 외 작업
+
+### 케이스 분류
+
+| 조건 | 복잡도 | 예시 |
+|------|--------|------|
+| $f(n) = O(n^{\log_b a - \epsilon}), \epsilon > 0$ | $O(n^{\log_b a})$ | 이진 탐색 |
+| $f(n) = \Theta(n^{\log_b a})$ | $O(n^{\log_b a} \log n)$ | 병합 정렬 |
+| $f(n) = \Omega(n^{\log_b a + \epsilon}), \epsilon > 0$ | $O(f(n))$ | - |
+
+### 병합 정렬 예시
+
+$$T(n) = 2T(n/2) + O(n)$$
+
+여기서:
+- $a = 2, b = 2, f(n) = n$
+- $\log_b a = \log_2 2 = 1$
+- $f(n) = \Theta(n^1)$ → 케이스 2
+
+따라서 $T(n) = O(n \log n)$
+
+## 점근적 표기법 비교
+
+| 표기법 | 의미 | 설명 |
+|--------|------|------|
+| **$O$** (Big-O) | 상한 | $f(n) \leq c \cdot g(n)$ |
+| **$\Omega$** (Big-Omega) | 하한 | $f(n) \geq c \cdot g(n)$ |
+| **$\Theta$** (Big-Theta) | 상한 = 하한 | $c_1 \cdot g(n) \leq f(n) \leq c_2 \cdot g(n)$ |
+| **$o$** (Little-o) | 엄격한 상한 | $f(n) < c \cdot g(n)$ |
+| **$\omega$** (Little-omega) | 엄격한 하한 | $f(n) > c \cdot g(n)$ |
+
+## 실전 팁
+
+### 복잡도 개선 전략
+
+**1. 불필요한 연산 제거**
+
+```javascript
+// Bad: O(n²)
+for (let i = 0; i < n; i++) {
+  for (let j = 0; j < n; j++) {
+    console.log(arr[i] + arr[j]);
+  }
+}
+
+// Good: O(n)
+for (let i = 0; i < n; i++) {
+  console.log(arr[i] * 2);
+}
+```
+
+**2. 적절한 자료구조 사용**
+
+```javascript
+// 배열 탐색: O(n)
+const found = arr.find(x => x === target);
+
+// Set 탐색: O(1)
+const set = new Set(arr);
+const found = set.has(target);
+```
+
+**3. 메모이제이션**
+
+```javascript
+// 피보나치 - 재귀: O(2ⁿ)
+function fib(n) {
+  if (n <= 1) return n;
+  return fib(n-1) + fib(n-2);
+}
+
+// 피보나치 - DP: O(n)
+function fibDP(n) {
+  const dp = [0, 1];
+  for (let i = 2; i <= n; i++) {
+    dp[i] = dp[i-1] + dp[i-2];
+  }
+  return dp[n];
+}
+```
+
+## 결론
+
+알고리즘 복잡도 분석은 효율적인 코드를 작성하는 데 필수적입니다. 
+
+**핵심 원칙:**
+- 입력 크기가 클수록 $O(n \log n)$ 이하를 목표로
+- 공간-시간 트레이드오프 고려
+- 실제 성능은 상수 요인도 중요
