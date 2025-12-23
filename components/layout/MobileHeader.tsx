@@ -1,4 +1,4 @@
-import { Menu, User } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
 
 interface MobileHeaderProps {
@@ -19,10 +19,7 @@ export function MobileHeader({ onMenuClick, onHomeClick }: MobileHeaderProps) {
         </button>
 
         <Link href="/" className="flex items-center gap-2" onClick={onHomeClick}>
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <User className="w-5 h-5 text-white" strokeWidth={2.5} />
-          </div>
-          <span className="text-white tracking-tight">Dev Blog</span>
+          <span className="text-white tracking-tight text-base font-semibold">dev.log()</span>
         </Link>
 
         <div className="w-10" /> {/* Spacer for centering */}

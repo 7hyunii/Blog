@@ -1,4 +1,4 @@
-import { Calendar, ArrowRight } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { Post } from '@/lib/posts';
@@ -98,7 +98,7 @@ export function PostList({ posts, pageSize = 6 }: PostListProps) {
                 </div>
               </div>
 
-              <div className="flex items-start justify-between gap-4 sm:gap-5 lg:gap-6">
+              <div className="flex items-start gap-4 sm:gap-5 lg:gap-6">
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg sm:text-xl lg:text-2xl tracking-tight mb-2 text-gray-100 group-hover:text-blue-400 transition-colors leading-snug">
                     {post.title}
@@ -107,12 +107,6 @@ export function PostList({ posts, pageSize = 6 }: PostListProps) {
                   <p className="text-gray-500 leading-relaxed line-clamp-2 text-sm sm:text-base">
                     {post.content.split('\n\n')[0]}
                   </p>
-                </div>
-
-                <div className="opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1 hidden sm:block">
-                  <div className="w-9 sm:w-10 lg:w-11 h-9 sm:h-10 lg:h-11 bg-blue-500 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <ArrowRight className="w-4 lg:w-5 h-4 lg:h-5 text-white" strokeWidth={2.5} />
-                  </div>
                 </div>
               </div>
             </article>
