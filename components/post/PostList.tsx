@@ -100,7 +100,7 @@ export function PostList({ posts, pageSize = 6 }: PostListProps) {
 
               <div className="flex items-start gap-4 sm:gap-5 lg:gap-6">
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl tracking-tight mb-2 text-gray-100 group-hover:text-blue-400 transition-colors leading-snug">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl tracking-tight mb-2 text-gray-100 group-hover:text-cyan-200 transition-colors leading-snug">
                     {post.title}
                   </h2>
 
